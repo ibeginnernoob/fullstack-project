@@ -4,6 +4,7 @@ import { zod } from 'zod';
 import User from '../models/user';
 
 import { JWT_SECRET } from '../config';
+import Account from '../models/account';
 
 const usernameSchema=zod.email();
 const nameSchema=zod.string().min(3);
@@ -38,12 +39,14 @@ export const signup=async (req,res,next)=>{
 
         const savedUser=await newUser.save();
 
-        const token=jwt.sign({
-            userId:savedUser._id
-        },JWT_SECRET);
+        const newAccount=new Account({
+            userId:savedUser._id,
+            balance:Math.random()*10000+1
+        });
+
+        await newAccount.save();
 
         return res.status(200).json({
-            token:token,
             message:'User successfully created!'
         });
     } catch(err){
@@ -127,7 +130,7 @@ export const updateUser=async (req,res,next)=>{
 }
 
 export const filterUsers=async (req,res,next)=>{
-    const filter=req.query.filter;
+    const filter=req.query.filter||'';
     try{
         const users=await User.find({
             $or:[
