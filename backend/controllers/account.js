@@ -50,8 +50,6 @@ export const updateBalance=async (req,res,next)=>{
 
                 await receiverAccount.save({session:session}).session(session);
 
-                await session.commitTransaction();
-
                 return res.status(200).json({
                     message:'Transfer successful!'
                 });
